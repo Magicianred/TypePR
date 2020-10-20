@@ -12,19 +12,24 @@
 }
 
 body {
+	display: flex;
 	background-color: var(--background-color);
 	margin: auto;
 	width: 100vw;
 	height: 100vh;
 	font-size: 25px;
 	color: var(--text-color);
+
+	align-content: center;
+	justify-content: center;
 }
 
 settings_button {
 	position: absolute;
 	display: block;
 
-	right: 10px;
+	left: 50%;
+	transform: translate(-50%);
 	bottom: 10px;
 	background-color: transparent;
 	color: var(--main-color);
@@ -39,16 +44,15 @@ settings_button:hover {
 }
 
 main_container {
-	top: 50%;
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	margin: auto;
 	width: 95%;
 	max-width: 700px;
-	padding: 10px;
-	transform: translate(0, -50%);
 	align-self: center;
+	align-content: center;
+	justify-content: center;
 }
 
 header {
@@ -83,7 +87,6 @@ mistakes {
 timer {
 	position: absolute;
 	right: 0px;
-	top: 10px;
 }
 
 text_fields_container {
@@ -95,7 +98,7 @@ text_fields_container {
 	padding: 10px;
 	padding-bottom: 20px;
 	border-top-width: 1px;
-	width: 100%;
+	width: inherit;
 	margin: auto;
 	background-color: var(--main-color);
 }
@@ -106,11 +109,12 @@ text_fields_container > * {
 }
 
 text_to_type {
+	width: fit-content;
 	height: fit-content;
 	position: relative;
 	display: block;
 	background-color: inherit;
-	align-self: center;
+	/* align-self: center; */
 	/* border-radius: 10px; */
 	padding: 20px;
 }
@@ -140,4 +144,154 @@ input {
 	color: inherit;
 	/* color:black; */
 	/* border-bottom: 2px dashed lightblue; */
+}
+
+settings {
+	display: none;
+	position: absolute;
+	background-color: var(--main-color);
+	width: fit-content;
+	height: auto;
+	margin: auto;
+	top: 50%;
+	padding: 25px;
+	padding-bottom: 20px;
+	border: 1px solid var(--text-color);
+	border-radius: 5px;
+	text-align: left;
+	transform: translate(0, -50%);
+}
+setting {
+	display: table-row;
+	height: 50px;
+	text-align: left;
+}
+setting > * {
+	display: table-cell;
+	position: relative;
+	padding: 0px;
+
+	/* line-height: 50px; */
+}
+
+setting > span:last-child {
+	/* position: relative; */
+	top: 5px;
+	/* height: 50px; */
+	/* transform: translateY(25%); */
+}
+setting > span:first-child {
+	padding-right: 50px;
+}
+
+setting > * > input {
+	/* margin-left: 40%;
+	width: 30%;
+	margin-left: 50px; */
+}
+
+settings > button {
+	width: 25%;
+	height: auto;
+	margin-top: 10px;
+	cursor: pointer;
+	font-size: 18px;
+	position: relative;
+	background-color: var(--main-color);
+	filter: brightness(1.2);
+	outline: none;
+	border-radius: 5px;
+	padding: 10px;
+	/* border: 1px solid var(--text-color); */
+	border: none;
+	align-self: center;
+	justify-self: center;
+	text-align: center;
+	left: 50%;
+	transform: translate(-50%);
+}
+
+settings > button:hover {
+	filter: brightness(1.1);
+}
+
+span > label {
+	display: inline-block;
+	width: 25px;
+	height: 25px;
+	background-color: var(--main-color);
+	filter: brightness(1.4);
+	cursor: pointer;
+}
+
+span > label:hover {
+	filter: brightness(1.5);
+}
+
+input:checked + .checkboxLabel > filler {
+	background-color: var(--text-color);
+}
+label {
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+	line-height: 20px;
+	color: var(--main-color);
+}
+.radioLabel {
+	background-color: transparent;
+	text-align: center;
+	border-bottom: 1px solid var(--main-color);
+}
+
+input:checked + .radioLabel {
+	color: var(--text-color);
+	border-color: var(--text-color);
+}
+
+label > filler {
+	flex: 1 1 auto;
+	display: block;
+	background-color: transparent;
+	width: 75%;
+	height: 75%;
+	margin: auto;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+span > input {
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+	height: 0;
+	width: 0;
+}
+
+@media screen and (max-width: 700px) {
+	main_container {
+		width: 100vw;
+		padding: 0px;
+	}
+	text_fields_container {
+		width: 100vw;
+		margin: auto;
+		background-color: var(--main-color);
+		align-content: center;
+		justify-content: center;
+	}
+	text_fields_container > * {
+		width: 90%;
+	}
+}
+
+@media screen and (max-height: 500px) {
+	main_container {
+		margin: 0px;
+		margin-bottom: 50px;
+	}
+	body {
+	}
 }

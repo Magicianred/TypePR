@@ -1,27 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="./main.css" />
-		<script src="./wordlist.js"></script>
 
-		<title>TypePR</title>
-	</head>
-	<body>
-		<settings_button>{Settings}</settings_button>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="./main.css" />
+	<script src="./wordlist.js"></script>
 
-		<main_container>
-			<header>
-				<words_per_minute><wpm>0</wpm>wpm</words_per_minute
-				><mistakes>0</mistakes><timer><time>0</time>s</timer>
-			</header>
+	<title>TypePR</title>
+</head>
 
-			<text_fields_container>
-				<text_to_type></text_to_type>
-				<input type="text" />
-			</text_fields_container>
-		</main_container>
-		<script src="./main.js"></script>
-	</body>
+<body>
+	<main_container>
+		<header>
+			<words_per_minute>
+				<wpm>0</wpm>wpm
+			</words_per_minute>
+			<mistakes>0</mistakes>
+			<timer><time>0</time>s</timer>
+		</header>
+
+		<text_fields_container>
+			<text_to_type></text_to_type>
+			<input autocapitalize="off" type="text" />
+		</text_fields_container>
+	</main_container>
+
+	<settings_button>{Settings}</settings_button>
+	<settings>
+		<setting>
+			<span>mistakesAllowed</span>
+			<span>
+				<input id="mistakesAllowed" type="checkbox" />
+				<label class='checkboxLabel' for="mistakesAllowed">
+					<filler />
+				</label>
+			</span>
+		</setting>
+		<setting>
+			<span>wordListLevel</span><span>
+				<input value='0' name='wordListLevel' id='wordListLevel0' type="radio" />
+				<label class='radioLabel' for="wordListLevel0">
+					</filler>0<filler>
+				</label>
+				<input value='1' name='wordListLevel' id='wordListLevel1' type="radio" />
+				<label class='radioLabel' for="wordListLevel1">
+					</filler>1<filler>
+				</label>
+			</span>
+		</setting>
+
+
+		<button onclick='toggleSettings()'>Save</button>
+	</settings>
+	<script src="./main.js"></script>
+</body>
+
 </html>
