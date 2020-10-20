@@ -8,12 +8,12 @@ timerStarted = false;
 incorrectLetterColor = "indianred";
 correctLetterColor = "lightgreen";
 
-eval(document.cookie.split('set_').join('')) // this sets all the settings from a existing cookies
-
-// mistakesAllowed = true;
-// wordListLevel = 0;    //0-easy 1-hard
+//Default settings
+mistakesAllowed = true;
+wordListLevel = 0;    //0-easy 1-hard
 wordListsList = [wordListEasy, wordListHard]
 
+eval(document.cookie.split('set_').join('')) // this sets all the settings from a existing cookies
 
 
 function generateWords() {
