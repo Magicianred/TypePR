@@ -6,13 +6,14 @@ let wordsTyped = 0;
 let timerStarted = false;
 let timerPrecision = 0;   // 0 - 0   1 - 0.0  2 - 0.00 .... 
 
+//Idea make a settings object with the setting name and type. and with that generate the html for the settings element
 //Default settings
 let mistakesAllowed = true;
 let wordListLevel = 0;    //0-easy 1-hard
 let wordCount = 10;
 let fontSize = getComputedStyle(document.documentElement).getPropertyValue("--font-size").replace(/px/g, '');
 
-eval(document.cookie.split('set_').join('')) // this sets all the settings from a existing cookies
+eval(document.cookie.split('set_').join('')) //Neatly set all the browser cookies to a variable.
 document.documentElement.style.setProperty('--font-size', fontSize + "px");
 
 wordListsList = [wordListEasy, wordListHard]
@@ -44,9 +45,8 @@ function prepareNextWord() {
 	textIn.value = ""; // Clear the input
 	currentWordLetterNum = 0; // Reset the letter number to the first index (0)
 	wordsTyped++;
-
 	//Check if there is next word \/
-	currentWordNum + 1 != wordsArray.length && (document.querySelector("word" + wordsTyped).scrollIntoView({ block: "start", inline: "nearest" }));
+	currentWordNum + 1 != wordsArray.length && (document.querySelector("word" + (currentWordNum + 1)).scrollIntoView({ block: "start", inline: "nearest" }));
 	document.querySelector("wpm").innerHTML = Math.round((60 / (timer.timerElapsed / 1000)) * wordsTyped, 2); // Calc wpm
 	textIn.style.backgroundColor = "";
 }
