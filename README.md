@@ -8,6 +8,3 @@ Just head on over to: [TypePR](https://manthee1.github.io/TypePR/)
 ## Contributions
 
 Pull requests are welcome. So have at it.
-
-
-
