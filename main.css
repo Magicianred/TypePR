@@ -1,6 +1,9 @@
 :root {
 	--background-color: lightslategray;
+	--main-color-dark: #263f3f;
 	--main-color: darkslategray;
+	--main-color-bright: #385f5f;
+
 	--text-color: white;
 	--mistake-color: indianred;
 	--main-font: consolas;
@@ -19,13 +22,12 @@ body {
 	height: 100vh;
 	font-size: 25px;
 	color: var(--text-color);
-
 	align-content: center;
 	justify-content: center;
 }
 
 settings_button {
-	position: absolute;
+	position: fixed;
 	display: block;
 
 	left: 50%;
@@ -37,6 +39,7 @@ settings_button {
 	align-self: right;
 	opacity: 1;
 	cursor: pointer;
+	z-index: 1;
 }
 
 settings_button:hover {
@@ -73,6 +76,7 @@ header > * {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 	padding: 4px 10px 0px 10px;
+	color: var(--text-color);
 	background-color: var(--main-color);
 }
 wpm,
@@ -114,9 +118,13 @@ text_to_type {
 	position: relative;
 	display: block;
 	background-color: inherit;
+	overflow-y: scroll;
+	max-height: 500px;
+	/* max-width: 50vh; */
 	/* align-self: center; */
 	/* border-radius: 10px; */
-	padding: 20px;
+	padding: 0px 20px 0px 20px;
+	margin: 20px 0px;
 }
 
 text_to_type > * {
@@ -132,18 +140,12 @@ input {
 	margin: 0px 0px;
 	border-radius: 5px;
 	padding: 10px;
-	/* color: slategrey; */
 	color: inherit;
-	/* border: 1px solid rgb(224, 224, 224); */
 	border: none;
-
-	filter: brightness(1.2);
-	/* border:none; */
+	background-color: var(--main-color-bright);
 	font-size: inherit;
 	outline: none;
 	color: inherit;
-	/* color:black; */
-	/* border-bottom: 2px dashed lightblue; */
 }
 
 settings {
@@ -169,19 +171,19 @@ setting {
 setting > * {
 	display: table-cell;
 	position: relative;
-	padding: 0px;
-
+	padding: 2px 0px;
+	line-height: 50px;
 	/* line-height: 50px; */
 }
 
 setting > span:last-child {
 	/* position: relative; */
-	top: 5px;
+	/* top: 5px; */
 	/* height: 50px; */
 	/* transform: translateY(25%); */
 }
 setting > span:first-child {
-	padding-right: 50px;
+	padding-right: 35px;
 }
 
 setting > * > input {
@@ -197,8 +199,7 @@ settings > button {
 	cursor: pointer;
 	font-size: 18px;
 	position: relative;
-	background-color: var(--main-color);
-	filter: brightness(1.2);
+	background-color: var(--main-color-bright);
 	outline: none;
 	border-radius: 5px;
 	padding: 10px;
@@ -212,7 +213,7 @@ settings > button {
 }
 
 settings > button:hover {
-	filter: brightness(1.1);
+	filter: brightness(1.2);
 }
 
 span > label {
@@ -226,6 +227,10 @@ span > label {
 
 span > label:hover {
 	filter: brightness(1.5);
+}
+.checkboxLabel {
+	top: 5px;
+	position: relative;
 }
 
 input:checked + .checkboxLabel > filler {
@@ -262,12 +267,27 @@ label > filler {
 	transform: translateY(-50%);
 }
 
-span > input {
+span > input[type="checkbox"],
+span > input[type="radio"] {
 	position: absolute;
 	opacity: 0;
 	cursor: pointer;
 	height: 0;
 	width: 0;
+}
+
+span > input[type="number"] {
+	flex: 1 1 auto;
+	display: block;
+	background-color: var(--main-color-bright);
+	padding: 5px;
+	width: 50px;
+	text-align: center;
+
+}
+
+span > input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
 }
 
 @media screen and (max-width: 700px) {
@@ -294,4 +314,25 @@ span > input {
 	}
 	body {
 	}
+}
+
+/* SCROLLBAR css stolen from w3school.com */
+::-webkit-scrollbar {
+	width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: var(--main-color-dark);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: var(--main-color-bright);
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: var(--text-color);
 }
