@@ -162,12 +162,6 @@ function addListeners() {
 				cookie.set('set_' + elementName, val)
 			})
 			document.documentElement.style.setProperty('--font-size', fontSize + "px");
-
-
-			cookie.set('set_wordListLevel', wordListLevel)
-			cookie.set('set_wordCount', wordCount)
-			cookie.set('set_fontSize', fontSize)
-
 			generateWords()
 		}
 
