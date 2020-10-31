@@ -6,15 +6,14 @@ let wordsTyped = 0;
 let timerStarted = false;
 let timerPrecision = 0;   // 0 - 0   1 - 0.0  2 - 0.00 .... 
 
-const incorrectLetterColor = "indianred";
-const correctLetterColor = "lightgreen";
-
 //Default settings
 let mistakesAllowed = true;
 let wordListLevel = 0;    //0-easy 1-hard
 let wordCount = 10;
+let fontSize = getComputedStyle(document.documentElement).getPropertyValue("--font-size").replace(/px/g, '');
 
 eval(document.cookie.split('set_').join('')) // this sets all the settings from a existing cookies
+document.documentElement.style.setProperty('--font-size', fontSize + "px");
 
 wordListsList = [wordListEasy, wordListHard]
 
@@ -36,7 +35,6 @@ function generateWords() {
 		}
 		newText += `</word${i}> `;
 	}
-
 	textToType.innerHTML = newText;
 	document.querySelector(`word${currentWordNum}`).style.color = "inherit";
 	textIn.style.backgroundColor = "";
@@ -46,7 +44,9 @@ function prepareNextWord() {
 	textIn.value = ""; // Clear the input
 	currentWordLetterNum = 0; // Reset the letter number to the first index (0)
 	wordsTyped++;
-	document.querySelector("word" + wordsTyped).scrollIntoView({ block: "start", inline: "nearest" });
+
+	//Check if there is next word \/
+	currentWordNum + 1 != wordsArray.length && (document.querySelector("word" + wordsTyped).scrollIntoView({ block: "start", inline: "nearest" }));
 	document.querySelector("wpm").innerHTML = Math.round((60 / (timer.timerElapsed / 1000)) * wordsTyped, 2); // Calc wpm
 	textIn.style.backgroundColor = "";
 }
@@ -92,14 +92,12 @@ function addListeners() {
 			timerStarted = false;
 			generateWords();
 		} else if ((letterInVal == " "  /*if space */) && checkWordMatch(textInVal, wordsArray[currentWordNum])) {
-			//if a word end is reached
+			//If a word end is reached and space is pressed
 			event.stopPropagation();
 			event.preventDefault();
 			prepareNextWord();
-
-			// If there is no other letter in the word
-			elementExists(getWordLetter(++currentWordNum, 0)) && (nextWordLetter = getWordLetter(currentWordNum, 0))
-			document.querySelector(`word${currentWordNum}`).style.color = "inherit";
+			//Increments the currentWordNum and sets the nextWordLetter to the next words letter.
+			wordsArray[++currentWordNum] != undefined && (nextWordLetter = wordsArray[currentWordNum][0])
 		} else {
 			let mistakeEncountered = false
 			//Check if the input letters match the onscreen letters and highligh them.
@@ -107,57 +105,75 @@ function addListeners() {
 				currentLetterElement = getWordLetter(currentWordNum, i);
 				if (i < textInVal.length) {
 					//color the letters based on their correctness.
-					if (textInVal[i] == wordsArray[currentWordNum][i]) currentLetterElement.style.color = correctLetterColor;
+					if (textInVal[i] == wordsArray[currentWordNum][i]) currentLetterElement.style.color = "var(--correct-color)";
 					else {
-						currentLetterElement.style.color = incorrectLetterColor;
+						currentLetterElement.style.color = "var(--mistake-color)";
 						mistakeEncountered = true;
 					}
 				} else currentLetterElement.style.color = ""; //If we exhausted all the letters inputted and the word is not yet finished 
 			}
-			(mistakeEncountered && (textIn.style.background = incorrectLetterColor)) || (textIn.style.background = "");
+			(mistakeEncountered && (textIn.style.background = "var(--mistake-color)")) || (textIn.style.background = "");
 			//If a mistake was encountered than color some things red.. 
 		}
 	});
 
 
 	settings_button = document.querySelector('settings_button');
-
+	settingsEl = document.querySelector('settings');
+	mainContainerEl = document.querySelector('main_container');
+	settingsEl.addEventListener('keyup', (event) => { event.keyCode == 13 && toggleSettings() })
 	settings_button.addEventListener('click', toggleSettings = () => {
-		settingsEl = document.querySelector('settings');
-		mainContainerEl = document.querySelector('main_container');
+
 		if (settingsEl.style.display != 'block') {
 			//Grab all the settings from variables and display them. inside the element.
-
 			settingsEl.style.display = 'block';
 			mainContainerEl.style.display = 'none'
+
+			valueSettings = ['wordCount', 'fontSize',]
+
 			document.querySelector("#mistakesAllowed").checked = mistakesAllowed;
 			document.querySelector("#wordListLevel" + wordListLevel).checked = true;
-			document.querySelector("#wordCount").value = wordCount;
-
+			valueSettings.forEach(x => {
+				document.querySelector("#" + x).value = Number(eval(x));
+			});
 
 		} else {
 			wordCountLimit = 500;
 			settingsEl.style.display = '';
 			mainContainerEl.style.display = ''
 
-			//Write all the settings to variables and cookies.
-			mistakesAllowed = document.querySelector("#mistakesAllowed").checked;
-			wordListLevel = document.querySelector("#wordListLevel0").checked ? 0 : 1;
-			wordCount = Math.round(document.querySelector("#wordCount").value);
-			wordCount = Math.abs(wordCount)
-			wordCount = wordCount > wordCountLimit ? wordCountLimit : wordCount //Limit to 'wordCountLimit' words
 
-			cookie.set('set_mistakesAllowed', mistakesAllowed)
+			//Write all the settings to variables and cookies.
+			document.querySelectorAll("setting > * > input").forEach(element => {
+				let val;
+				elementName = element.name || element.id;
+				if (element.type == "checkbox") {
+					val = element.checked == false || true ? element.checked : false;
+				} else if (element.type == "radio" && element.checked) {
+					val = element.value
+				} else if (element.type == "number") {
+					val = element.value;
+					val = val >= element.min ? val : element.min;
+					val = val <= element.max ? val : element.max;
+					val = Math.round(val);
+				}
+				console.log(elementName, val);
+				val != undefined && eval(elementName + "=" + val)
+				cookie.set('set_' + elementName, val)
+			})
+			document.documentElement.style.setProperty('--font-size', fontSize + "px");
+
+
 			cookie.set('set_wordListLevel', wordListLevel)
 			cookie.set('set_wordCount', wordCount)
+			cookie.set('set_fontSize', fontSize)
 
 			generateWords()
 		}
 
 	});
+
 }
-
-
 
 function getWordLetter(wordIndex, letterIndex) {//returns the a words letter element -> (word4)(letter2)
 	return document.querySelector(`word${wordIndex}`).querySelector(`letter${letterIndex}`);
