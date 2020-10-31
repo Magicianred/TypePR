@@ -1,16 +1,13 @@
 # TypePR
 
-TypePR(type practice) is a web-based customizable typing test
+TypePR is a easy to use web-based customizable typing test with a modern-ish design
 
-## Usage
-
-Just head on over to: manthee1.github.io/typepr/
+## How to use
+Just head on over to: [TypePR](https://manthee1.github.io/typepr/)
 
 ## Contributions
 
 Pull requests are welcome. So have at it.
 
-## License
-NONE
 
 
