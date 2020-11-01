@@ -9,7 +9,7 @@
 	--correct-color: #90ee90;
 	--highlight-color: #fbabea;
 	--main-font: consolas;
-	--font-size: 25px;
+	--font-size: 20px;
 }
 
 * {
@@ -121,7 +121,7 @@ text_to_type {
 	position: relative;
 	display: block;
 	background-color: inherit;
-	overflow-y: scroll;
+	overflow-y: auto;
 	max-height: 500px;
 	/* max-width: 50vh; */
 	/* align-self: center; */
@@ -160,6 +160,8 @@ settings {
 	padding-bottom: 20px;
 	border: 1px solid var(--text-color);
 	border-radius: 5px;
+	overflow-y: auto;
+	max-height: 80vh;
 	text-align: left;
 	transform: translate(0, -50%);
 }
@@ -180,13 +182,16 @@ setting > * {
 setting > span:first-child {
 	padding-right: 35px;
 }
+setting > span:last-child {
+	text-align: center;
+}
 
 settings > button {
 	width: 25%;
 	height: auto;
-	margin-top: 10px;
+	margin-top: 8%;
 	cursor: pointer;
-	font-size: 50%;
+	font-size: 80%;
 	position: relative;
 	background-color: var(--main-color-bright);
 	outline: none;
@@ -236,6 +241,7 @@ label {
 .radioLabel {
 	background-color: transparent;
 	text-align: center;
+	margin: 0px 8px;
 	border-bottom: 1px solid var(--main-color);
 }
 
@@ -265,7 +271,9 @@ span > input[type="radio"] {
 	width: 0;
 }
 
-span > input[type="number"] {
+span > input[type="number"],
+span > input[type="text"] {
+	margin: auto;
 	flex: 1 1 auto;
 	display: block;
 	background-color: var(--main-color-bright);
@@ -274,24 +282,41 @@ span > input[type="number"] {
 	text-align: center;
 }
 
+span > input[type="text"] {
+	width: 100px;
+}
+
 span > input[type="number"]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 }
 
 @media screen and (max-width: 700px) {
+	body {
+		min-height: 300px;
+	}
 	main_container {
+		font-size: 50%;
 		width: 100vw;
 		padding: 0px;
 	}
 	text_fields_container {
-		width: 100vw;
+		width: 90%;
 		margin: auto;
 		background-color: var(--main-color);
 		align-content: center;
 		justify-content: center;
+		max-height: 50vh;
 	}
 	text_fields_container > * {
 		width: 90%;
+	}
+	text_to_type {
+		min-height: 20px;
+		width: auto;
+	}
+
+	settings {
+		font-size: 50%;
 	}
 }
 

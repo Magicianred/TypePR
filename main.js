@@ -1,43 +1,70 @@
 const textToType = document.querySelector("text_to_type");
 const textIn = document.querySelector("input");
 const timeEl = document.querySelector("time");
+
+const settings_button = document.querySelector('settings_button');
+const settingsEl = document.querySelector('settings');
+const mainContainerEl = document.querySelector('main_container');
+
 let mistakes = 0;
 let wordsTyped = 0;
 let timerStarted = false;
-let timerPrecision = 0;   // 0 - 0   1 - 0.0  2 - 0.00 .... 
+const wordListsList = [wordListEasy, wordListHard];
 
-//Idea make a settings object with the setting name and type. and with that generate the html for the settings element
 //Default settings
 let mistakesAllowed = true;
 let wordListLevel = 0;    //0-easy 1-hard
 let wordCount = 10;
-let fontSize = getComputedStyle(document.documentElement).getPropertyValue("--font-size").replace(/px/g, '');
+let timerPrecision = 0;   // 0 - 0   1 - 0.0  2 - 0.00 .... 
+let fontSize
+let fontFamily
 
 eval(document.cookie.split('set_').join('')) //Neatly set all the browser cookies to a variable.
-document.documentElement.style.setProperty('--font-size', fontSize + "px");
 
-wordListsList = [wordListEasy, wordListHard]
+function createSettingsObject(pipeVars = false) {
 
+	settingsObject = {
+		mistakesAllowed: { type: 'checkbox', value: mistakesAllowed, css: null },
+		wordListLevel: { type: 'radio', values: [0, 1], value: wordListLevel, css: null },
+		wordCount: { type: 'number', value: wordCount, min: 5, max: 500, css: null },
+		fontSize: { type: 'number', value: fontSize, min: 15, max: 35, css: { cssVariableName: "font-size", cssValueSuffix: 'px' } },
+		fontFamily: { type: 'text', value: fontFamily, min: 15, max: 35, css: { cssVariableName: "main-font", cssValueSuffix: '' } },
+		timerPrecision: { type: 'number', value: timerPrecision, min: 0, max: 2, css: null },
+	}
+	//Get the css variables and pipe them over to js. Should be only called once on page load
+	if (pipeVars) {
+		Object.entries(settingsObject).forEach(x => {
+			let [entryName, entryProperties] = [x[0], x[1]]
+			if (entryProperties.css != null) { // find the entry's that have a variable defined in css
+				let regexExclude = "/" + entryProperties.css.cssValueSuffix + "/g";
+				val = getComputedStyle(document.documentElement).getPropertyValue("--" + entryProperties.css.cssVariableName).replace(eval(regexExclude), '').trim();
+				val = entryProperties.type == "number" ? Number(val) || 0 : `"${val}"`;
+				console.log(val);
+				eval('settingsObject.' + entryName + '.value = ' + val) // set the value in the object
+				eval(entryName + "=" + val);// set the variable
+			}
+		});
+	}
+}
 function generateWords() {
-	newText = "";
-	textIn.value = ''
+	let wordList = wordListsList[wordListLevel];// set the wordlist based on the wordlist level
+	let newText = "";
 	wordsArray = [];
 	currentWordNum = 0;
 	currentWordLetterNum = 0;
-	wordList = wordListsList[wordListLevel];
+	textIn.value = '';
+	//Randomize words and chop them into pieces
 	for (let i = 0; i < wordCount; i++) {
 		randomWordNum = Math.round(Math.random() * (wordList.length - 1));
 		wordsArray.push(wordList[randomWordNum]);
-		// newText += `<word${i}>${wordList[randomWordNum]}</word${i}> `;
-		wordToAdd = wordList[randomWordNum];
+		let wordToAdd = wordList[randomWordNum];
 		newText += `<word${i}>`;
-		for (let j = 0; j < wordToAdd.length; j++) {
+		for (let j = 0; j < wordToAdd.length; j++) {//Chop them into letter elements marked with an index(j),
 			newText += `<letter${j}>${wordToAdd[j]}</letter${j}>`;
 		}
 		newText += `</word${i}> `;
 	}
 	textToType.innerHTML = newText;
-	document.querySelector(`word${currentWordNum}`).style.color = "inherit";
 	textIn.style.backgroundColor = "";
 }
 
@@ -52,21 +79,22 @@ function prepareNextWord() {
 }
 
 function addListeners() {
+
+	// Typing listener || Input listener
 	textIn.addEventListener("input", (event) => {
 		let textInVal = textIn.value
 		let letterInVal = textInVal.slice(-1);
 		let currentWordLetterNum = textInVal.length - 1;
-		let currentLetterElement = getWordLetter(currentWordNum, currentWordLetterNum);
 
-		//If the input is empty and backspace is pressed -> do nothing
+		//If space is press at the beginning of a word -> do nothing
 		if (textInVal.trim() == "" && event.inputType != "deleteContentBackward") {
 			event.stopPropagation()
 			event.preventDefault()
 			textIn.value = '';
+			textIn.focus
 			return false
-		}//if space is press at the beginning of a word just ignore it
+		}
 
-		// Redid the input handling
 		timerStarted == false && (timerStarted = true) && timer.resume();
 
 		let checkIfMistakeOccurred =
@@ -102,7 +130,7 @@ function addListeners() {
 			let mistakeEncountered = false
 			//Check if the input letters match the onscreen letters and highligh them.
 			for (let i = 0; i < wordsArray[currentWordNum].length; i++) {
-				currentLetterElement = getWordLetter(currentWordNum, i);
+				currentLetterElement = document.querySelector(`word${currentWordNum}`).querySelector(`letter${i}`);
 				if (i < textInVal.length) {
 					//color the letters based on their correctness.
 					if (textInVal[i] == wordsArray[currentWordNum][i]) currentLetterElement.style.color = "var(--correct-color)";
@@ -117,65 +145,46 @@ function addListeners() {
 		}
 	});
 
-
-	settings_button = document.querySelector('settings_button');
-	settingsEl = document.querySelector('settings');
-	mainContainerEl = document.querySelector('main_container');
+	// Settings (open || close) listeners
 	settingsEl.addEventListener('keyup', (event) => { event.keyCode == 13 && toggleSettings() })
 	settings_button.addEventListener('click', toggleSettings = () => {
-
+		timer.stop();
 		if (settingsEl.style.display != 'block') {
-			//Grab all the settings from variables and display them. inside the element.
 			settingsEl.style.display = 'block';
 			mainContainerEl.style.display = 'none'
 
-			valueSettings = ['wordCount', 'fontSize',]
-
-			document.querySelector("#mistakesAllowed").checked = mistakesAllowed;
-			document.querySelector("#wordListLevel" + wordListLevel).checked = true;
-			valueSettings.forEach(x => {
-				document.querySelector("#" + x).value = Number(eval(x));
-			});
-
+			//Make sure all the number fields are updated without any invalid numbers in them.
+			Object.entries(settingsObject).forEach(x => {
+				let [entryName, entryProperties] = [x[0], x[1]]
+				if (entryProperties.type == "number") document.querySelector(`#${entryName}`).value = entryProperties.value
+			})
 		} else {
-			wordCountLimit = 500;
 			settingsEl.style.display = '';
 			mainContainerEl.style.display = ''
-
 
 			//Write all the settings to variables and cookies.
 			document.querySelectorAll("setting > * > input").forEach(element => {
 				let val;
 				elementName = element.name || element.id;
-				if (element.type == "checkbox") {
-					val = element.checked == false || true ? element.checked : false;
-				} else if (element.type == "radio" && element.checked) {
-					val = element.value
-				} else if (element.type == "number") {
-					val = element.value;
+				if (element.type == "checkbox") val = element.checked == true ? true : false;
+				else if (element.type == "radio" && element.checked) val = Number(element.value) || 0;
+				else if (element.type == "text") val = '"' + element.value.toString().trim() + '"'
+				else if (element.type == "number") {
+					val = Number(element.value);
 					val = val >= element.min ? val : element.min;
 					val = val <= element.max ? val : element.max;
 					val = Math.round(val);
 				}
-				console.log(elementName, val);
-				val != undefined && eval(elementName + "=" + val)
-				cookie.set('set_' + elementName, val)
+				val != undefined && eval(elementName + "=" + val) != undefined && cookie.set('set_' + elementName, val);
 			})
-			document.documentElement.style.setProperty('--font-size', fontSize + "px");
-			generateWords()
+			createSettingsObject(); //Update the settings object. Basically recreated with the updated variables.
+			Object.entries(settingsObject).forEach(x => {
+				let [entryName, entryProperties] = [x[0], x[1]]
+				entryProperties.css != null && document.documentElement.style.setProperty(`--${entryProperties.css.cssVariableName}`, entryProperties.value + entryProperties.css.cssValueSuffix);
+			});
+			generateWords()  // Re-generate words
 		}
-
 	});
-
-}
-
-function getWordLetter(wordIndex, letterIndex) {//returns the a words letter element -> (word4)(letter2)
-	return document.querySelector(`word${wordIndex}`).querySelector(`letter${letterIndex}`);
-}
-
-function elementExists(el) {
-	if (typeof el != "undefined" && el != null) return true;
-	else return false;
 }
 
 function checkWordMatch(a, b) {
@@ -186,7 +195,6 @@ function checkWordMatch(a, b) {
 	}
 }
 
-
 timer = {
 	timerElapsed: 0, //ms
 	updateInterval: 10,
@@ -195,7 +203,7 @@ timer = {
 		timer.resume()
 	},
 	stop: () => {
-		clearInterval(timerInterval);
+		typeof (timerInterval) != "undefined" && clearInterval(timerInterval);
 	},
 	resume: () => {
 		timerInterval = setInterval(() => {
@@ -206,7 +214,6 @@ timer = {
 };
 
 cookie = {
-
 	set: (name, val) => {
 
 		document.cookie = ` ${name}=${val};path=/`;
@@ -221,7 +228,29 @@ cookie = {
 
 }
 
+
+createSettingsObject(true);
+//Generate the settings HTML
+let settingsHTML = '';
+Object.entries(settingsObject).forEach(x => {
+	let [entryName, entryProperties] = [x[0], x[1]]
+	settingsHTML += `<setting><span>${entryName}</span><span>`
+	if (entryProperties.type == "checkbox") settingsHTML += `<input name="${entryName}" id="${entryName}" checked=${entryProperties.value} type="checkbox" /><label class='checkboxLabel' for="${entryName}"><filler /></label>`
+	else if (entryProperties.type == "number") settingsHTML += `<input value='${entryProperties.value}' min='${entryProperties.min}'  max='${entryProperties.max}' name='${entryName}' id='${entryName}' type="number" />`
+	else if (entryProperties.type == "text") settingsHTML += `<input value='${entryProperties.value}' max-length='${entryProperties.max}' name='${entryName}' id='${entryName}' type="text" />`;
+	else if (entryProperties.type == "radio") {
+		entryProperties.values.forEach(val => {
+			settingsHTML += `<input value='${val}' ${val == entryProperties.value ? 'checked' : ''} name='${entryName}' id='${entryName}${val}' type="radio" /><label class='radioLabel' for="${entryName}${val}">${val}</label>`;
+		});
+	}
+	settingsHTML += `</span></setting>`
+
+});
+settingsHTML += "<button onclick='toggleSettings()'>Save</button>"
+settingsEl.innerHTML = settingsHTML
+
+
 //Main calls
 generateWords();
 addListeners();
-textIn.focus()
+textIn.focus();

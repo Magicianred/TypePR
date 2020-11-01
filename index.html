@@ -27,43 +27,7 @@
 	</main_container>
 
 	<settings_button>{Settings}</settings_button>
-	<settings>
-		<setting>
-			<span>mistakesAllowed</span>
-			<span>
-				<input name="mistakesAllowed" id="mistakesAllowed" type="checkbox" />
-				<label class='checkboxLabel' for="mistakesAllowed">
-					<filler />
-				</label>
-			</span>
-		</setting>
-		<setting>
-			<span>wordListLevel</span><span>
-				<input value='0' name='wordListLevel' id='wordListLevel0' type="radio" />
-				<label class='radioLabel' for="wordListLevel0">
-					</filler>0<filler>
-				</label>
-				<input value='1' name='wordListLevel' id='wordListLevel1' type="radio" />
-				<label class='radioLabel' for="wordListLevel1">
-					</filler>1<filler>
-				</label>
-			</span>
-		</setting>
-		<setting>
-			<span>wordCount</span>
-			<span>
-				<input min='1' value='10' max='500' name='wordCount' id='wordCount' type="number" />
-			</span>
-		</setting>
-		<setting>
-			<span>fontSize</span>
-			<span>
-				<input min='15' value='25' max='45' name='fontSize' id='fontSize' type="number" />
-			</span>
-		</setting>
-
-		<button onclick='toggleSettings()'>Save</button>
-	</settings>
+	<settings></settings>
 	<script src="./main.js"></script>
 </body>
 
