@@ -1,13 +1,11 @@
 :root {
-	--background-color: #778899;
-	--main-color-dark: #263f3f;
-	--main-color: #2f4f4f;
-	--main-color-bright: #385f5f;
+	--background-color: #000000;
+	--main-color: #383838;
 
 	--text-color: #ffffff;
 	--mistake-color: #cd5c5c;
 	--correct-color: #90ee90;
-	--highlight-color: #fbabea;
+	--highlight-color: #737373;
 	--main-font: consolas;
 	--font-size: 20px;
 }
@@ -55,45 +53,53 @@ main_container {
 	flex-direction: column;
 	margin: auto;
 	width: 95%;
+	border-radius: 5px;
 	max-width: 700px;
 	align-self: center;
 	align-content: center;
 	justify-content: center;
+	overflow: hidden;
 }
 
 header {
-	display: inline;
+	display: flex;
 	flex-direction: row;
-	width: 100%;
+	padding: 0 20px;
+	width: (100% - 40px);
 	height: 40px;
 	font-size: 50%;
 	line-height: 40px;
+	background-color: var(--main-color);
+	/* border-bottom: 2px solid var(--main-color); */
 }
 
 header > * {
-	display: inline-block;
-	width: fit-content;
+	flex: 1 1 auto;
 	text-align: center;
-	background-color: inherit;
-	margin: 0px 20px;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	padding: 4px 10px 0px 10px;
-	color: var(--text-color);
-	background-color: var(--main-color);
 }
+
 wpm,
 time,
 mistakes {
 	font-size: var(--font-size);
-	margin: 0px 2px;
+	/* margin: 0px 2px; */
 }
 mistakes {
 	color: var(--mistake-color);
 }
 timer {
-	position: absolute;
-	right: 0px;
+	text-align: right;
+	flex: 8 1 auto;
+	/* position: absolute; */
+	/* right: 0px; */
+}
+
+main_container > hr {
+	height: 4px;
+	margin: 0px;
+	background-color: var(--main-color);
+	filter: brightness(1.2);
+	border: none;
 }
 
 text_fields_container {
@@ -101,12 +107,12 @@ text_fields_container {
 	display: flex;
 	flex-direction: column;
 	background-color: inherit;
-	border-radius: 5px;
+	border-radius: 0px;
 	padding: 10px;
 	padding-bottom: 20px;
 	border-top-width: 1px;
-	width: inherit;
-	margin: auto;
+	width: calc(100% - 20px);
+
 	background-color: var(--main-color);
 }
 
@@ -142,7 +148,8 @@ input {
 	padding: 10px;
 	color: inherit;
 	border: none;
-	background-color: var(--main-color-bright);
+	background-color: var(--main-color);
+	filter: brightness(1.2);
 	font-size: inherit;
 	outline: none;
 	color: inherit;
@@ -152,30 +159,42 @@ settings {
 	display: none;
 	position: absolute;
 	background-color: var(--main-color);
-	width: fit-content;
+	flex-flow: column nowrap;
+	flex: 1 1 auto;
+	min-width: auto;
 	height: auto;
 	margin: auto;
 	top: 50%;
-	padding: 25px;
-	padding-bottom: 20px;
+	max-height: 50vh;
+	padding: 20px 15px 20px 25px;
 	border: 1px solid var(--text-color);
 	border-radius: 5px;
-	overflow-y: auto;
-	max-height: 80vh;
+	overflow-y: scroll;
 	text-align: left;
 	transform: translate(0, -50%);
 }
+
 setting {
-	display: table-row;
-	/* height: 50px; */
+	display: flex;
+	flex-flow: row nowrap;
+	flex: 1 1 auto;
+	width: 100%;
 	text-align: left;
 }
 setting > * {
-	display: table-cell;
+	display: flex;
+	flex-flow: row nowrap;
+	flex: 1 1 0;
 	position: relative;
 	padding: 2% 0px;
 	vertical-align: middle;
-	/* line-height: 50px; */
+	word-break: break-word;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-width: 0px;
+	white-space: nowrap;
+	align-content: center;
+	line-height: 30px;
 	/* line-height: 50px; */
 }
 
@@ -183,31 +202,53 @@ setting > span:first-child {
 	padding-right: 35px;
 }
 setting > span:last-child {
-	text-align: center;
+	justify-content: center;
 }
 
 settings > button {
-	width: 25%;
+	width: 100%;
 	height: auto;
-	margin-top: 8%;
+	flex: 1 1 auto;
+	margin-top: 10px;
 	cursor: pointer;
 	font-size: 80%;
 	position: relative;
-	background-color: var(--main-color-bright);
+	background-color: var(--main-color);
+	filter: brightness(1.2);
 	outline: none;
 	border-radius: 5px;
 	padding: 10px;
 	/* border: 1px solid var(--text-color); */
 	border: none;
-	align-self: center;
-	justify-self: center;
+	/* align-self: center; */
 	text-align: center;
-	left: 50%;
-	transform: translate(-50%);
+	/* left: 50%; */
+	/* transform: translate(-50%); */
+}
+
+settings > span.default {
+	display: inline-block;
+	position: fixed;
+	z-index: 1;
+	right: 5px;
+	padding: 4px;
+	font-size: 60%;
+	flex: 0 0 0px;
+	top: 8px;
+	color: var(--text-color);
+	background-color: var(--main-color);
+	filter: brightness(1.2);
+	/* bottom: 0px; */
+	cursor: pointer;
+	background-color: var(--main-color);
+}
+
+settings > span.default:hover {
+	filter: brightness(1.2);
 }
 
 settings > button:hover {
-	filter: brightness(1.2);
+	filter: brightness(1.4);
 }
 
 span > label {
@@ -223,7 +264,6 @@ span > label:hover {
 	filter: brightness(1.5);
 }
 .checkboxLabel {
-	top: 5px;
 	position: relative;
 }
 
@@ -235,7 +275,6 @@ label {
 	text-align: center;
 	justify-content: center;
 	align-content: center;
-	line-height: 20px;
 	color: var(--main-color);
 }
 .radioLabel {
@@ -276,7 +315,9 @@ span > input[type="text"] {
 	margin: auto;
 	flex: 1 1 auto;
 	display: block;
-	background-color: var(--main-color-bright);
+	background-color: var(--main-color);
+	filter: brightness(1.2);
+
 	padding: 5px;
 	width: 75px;
 	text-align: center;
@@ -288,6 +329,27 @@ span > input[type="text"] {
 
 span > input[type="number"]::-webkit-inner-spin-button {
 	-webkit-appearance: none;
+}
+
+span > input[type="color"] {
+	padding: 0px;
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	background-color: transparent;
+	-webkit-appearance: none;
+}
+
+span > input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+span > input[type="color"]::-webkit-color-swatch {
+	border: 1px solid white;
+	border-radius: 5px;
+}
+
+.colorText {
+	margin-right: 10px;
 }
 
 @media screen and (max-width: 700px) {
@@ -329,21 +391,28 @@ span > input[type="number"]::-webkit-inner-spin-button {
 
 /* SCROLLBAR css stolen from w3school.com */
 ::-webkit-scrollbar {
-	width: 4px;
+	width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-	background: var(--main-color-dark);
+	background: transparent;
+	filter: brightness(2);
+	width: 10px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-	background: var(--main-color-bright);
+	/* border-radius: 10px; */
+
+	background: gray;
 	border-radius: 10px;
+	border: 4px solid var(--main-color);
+	opacity: 0.5;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-	background: var(--text-color);
+	background: white;
+	opacity: 1;
 }
