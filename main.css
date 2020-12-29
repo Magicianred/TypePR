@@ -155,6 +155,29 @@ input {
 	color: inherit;
 }
 
+.reset {
+	border: none;
+	outline: none;
+	display: inline-block;
+	background-color: var(--main-color);
+	padding: 5px;
+	border-radius: 5px;
+	position: absolute;
+	font-size: 100%;
+	right: 25px;
+	bottom: 25px;
+	width: auto;
+	cursor: pointer;
+}
+
+.reset:hover {
+	filter: brightness(0.9);
+}
+
+.reset:active {
+	filter: brightness(1.2);
+}
+
 settings {
 	display: none;
 	position: absolute;
@@ -167,7 +190,7 @@ settings {
 	top: 50%;
 	max-height: 50vh;
 	padding: 20px 15px 20px 25px;
-	border: 1px solid var(--text-color);
+	/* border: 1px solid var(--text-color); */
 	border-radius: 5px;
 	overflow-y: scroll;
 	text-align: left;

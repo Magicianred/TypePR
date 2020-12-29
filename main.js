@@ -20,7 +20,7 @@ settings = {
 		this.highlightCursor = true
 		this.mistakesAllowed = true;
 		this.wordListLevel = 0;    //0-easy 1-hard
-		this.wordCount = 10;
+		this.wordCount = 25;
 		this.timerPrecision = 0;   // 0 - 0   1 - 0.0  2 - 0.00 .... 
 		this.fontSize = undefined;
 		this.fontFamily = undefined;
@@ -102,10 +102,10 @@ settings = {
 					val = Math.round(val);
 				}
 				if (element.type == "text" || element.type == "color") cookieVal = `'${val}'`; else cookieVal = val
-				val != undefined && (this.settingsObject[elementName].value = val) != undefined && cookie.set('set_' + elementName, cookieVal);
+				val != undefined && (this[elementName] = val) != undefined && cookie.set('set_' + elementName, cookieVal);
 			})
 
-			// this.createSettingsObject(); //Update the settings object. Basically recreated with the updated variables.
+			this.createSettingsObject(); //Update the settings object. Basically recreated with the updated variables.
 			Object.entries(this.settingsObject).forEach(x => {
 				let [entryName, entryProperties] = [x[0], x[1]];
 				entryProperties.css != null && entryProperties.value != undefined && document.documentElement.style.setProperty(`--${entryProperties.css.cssVariableName}`, entryProperties.value + entryProperties.css.cssValueSuffix);
@@ -131,7 +131,7 @@ typingTest = {
 		textToType.innerHTML = this.newSectionText;
 		textIn.value = '';
 		textIn.style.backgroundColor = "";
-		if (highlightCursor) {
+		if (settings.highlightCursor) {
 			previousHighlighCharacterElement = textToType.children[0]
 			// previousHighlighCharacterElement.style.backgroundColor = 'var(--highlight-color)';
 
@@ -150,9 +150,16 @@ typingTest = {
 	textInputHandler: function (event) {
 		let inputText = textIn.value
 		let characterIn = inputText.slice(-1);
+		let currentWord = this.wordsArray[this.currentWordIndex];
 		this.currentCharacterIndex = this.charactersTypedAmount + inputText.length - 1;
 
-
+		if (characterIn == '`') {
+			event.preventDefault()
+			event.stopPropagation();
+			textIn.value = '';
+			reset();
+			return false;
+		}
 		//If space is press at the beginning of a word -> do nothing
 		if (inputText.trim() == "" && !event.inputType.includes('delete')) {
 			event.stopPropagation();
@@ -162,7 +169,9 @@ typingTest = {
 			return false;
 		}
 
-		timerStarted == false && (timerStarted = true) && timer.resume();
+
+
+		timer.timerStarted == false && timer.resume();
 
 		let checkIfMistakeOccurred =
 			!event.inputType.includes('delete') &&
@@ -201,7 +210,7 @@ typingTest = {
 				let currentCharacterElement = textToType.children[this.charactersTypedAmount + i];
 				if (i < inputText.length) {
 					//color the characters based on their correctness.
-					if (inputText[i] == currentCharacterElement.innerHTML) currentCharacterElement.style.color = "var(--correct-color)";
+					if (inputText[i] == currentCharacterElement.innerHTML && i <= currentWord.length) currentCharacterElement.style.color = "var(--correct-color)";
 					else { currentCharacterElement.style.color = "var(--mistake-color)"; (mistakeEncountered = true); }
 				} else currentCharacterElement.style.color = ""; //If we exhausted all the characters inputted and the word is not yet finished 
 			}
@@ -211,7 +220,7 @@ typingTest = {
 	},
 	highlightCursorHandler: function () {
 		//Highlights the cursor position on the text Element
-		if (highlightCursor) {
+		if (settings.highlightCursor) {
 			setTimeout(() => {
 				previousHighlighCharacterElement.style.backgroundColor = '';
 				highlighCharacterElement = textToType.children[this.charactersTypedAmount + textIn.selectionEnd];
@@ -234,21 +243,39 @@ typingTest = {
 
 
 timer = {
+	timerStarted: false,
 	timerElapsed: 0, //ms
 	updateInterval: 10,
 	start: () => {
+
 		timer.timerElapsed = 0;
 		timer.resume()
+
 	},
 	stop: () => {
-		typeof (timerInterval) != "undefined" && clearInterval(timerInterval);
+		typeof timerInterval != "undefined" && clearInterval(timerInterval);
+		timer.timerStarted = false;
+	},
+	reset: () => {
+		timer.timerElapsed = 0;
+		timeEl.innerHTML = ''
+		timer.elSet(0);
 	},
 	resume: () => {
-		timerInterval = setInterval(() => {
-			timer.timerElapsed += timer.updateInterval;
-			timeEl.innerHTML = (timer.timerElapsed / 1000).toFixed(timerPrecision);
-		}, timer.updateInterval);
+		if (!timer.timerStarted) {
+			timerInterval = setInterval(() => {
+				timer.timerElapsed += timer.updateInterval;
+				timeEl.innerHTML = (timer.timerElapsed / 1000).toFixed(settings.timerPrecision);
+			}, timer.updateInterval);
+			timer.timerStarted = true;
+		}
+
 	},
+	elSet: (x = 0) => {
+		timeEl.innerHTML = x;
+
+
+	}
 };
 
 cookie = {
@@ -279,7 +306,16 @@ textIn.addEventListener("input", event => typingTest.textInputHandler(event)); /
 textIn.addEventListener('keydown', event => typingTest.highlightCursorHandler()); //cursor position highlighter
 settingsEl.addEventListener('keyup', event => { event.keyCode == 13 && settings.toggleSettings() }); // Settings (open || close) listeners
 settings_button.addEventListener('click', e => settings.toggleSettings())
+document.querySelector('.reset').addEventListener('click', reset = () => {
 
+	timer.stop();
+	timer.reset();
+	textIn.value = '';
+	typingTest.generateWords();
+	document.querySelector("mistakes").innerHTML = 0;
+	document.querySelector("wpm").innerHTML = 0;
+
+})
 
 
 settings.setDefaultSettings()
