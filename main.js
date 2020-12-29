@@ -156,7 +156,6 @@ typingTest = {
 		if (characterIn == '`') {
 			event.preventDefault()
 			event.stopPropagation();
-			textIn.value = '';
 			reset();
 			return false;
 		}
@@ -314,6 +313,7 @@ document.querySelector('.reset').addEventListener('click', reset = () => {
 	typingTest.generateWords();
 	document.querySelector("mistakes").innerHTML = 0;
 	document.querySelector("wpm").innerHTML = 0;
+	textIn.focus();
 
 })
 
