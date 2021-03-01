@@ -111,7 +111,7 @@ settings = {
 				let [entryName, entryProperties] = [x[0], x[1]];
 				entryProperties.css != null && entryProperties.value != undefined && document.documentElement.style.setProperty(`--${entryProperties.css.cssVariableName}`, entryProperties.value + entryProperties.css.cssValueSuffix);
 			});
-			typingTest.generateWords()  // Re-generate words
+			main.generateWords()  // Re-generate words
 		}
 
 
@@ -119,7 +119,7 @@ settings = {
 
 }
 
-typingTest = {
+main = {
 	generateWords: function () {
 		this.wordList = wordListsList[settings.wordListLevel];// set the wordlist based on the wordlist level
 		this.currentWordIndex = 0;
@@ -132,7 +132,6 @@ typingTest = {
 		textToType.innerHTML = this.newSectionText;
 		textIn.value = '';
 		textIn.style.backgroundColor = "";
-
 		if (settings.highlightCursor) {
 			previousHighlighCharacterElement = textToType.children[0]
 			// previousHighlighCharacterElement.style.backgroundColor = 'var(--highlight-color)';
@@ -146,7 +145,6 @@ typingTest = {
 		wordsTyped++;
 		//Check if there is next word \/
 		this.currentWordIndex + 1 != this.wordsArray.length && textToType.children[this.currentWordIndex + 1].scrollIntoView({ block: "start", inline: "nearest" });
-		document.querySelector("wpm").innerHTML = Math.round((60 / (timer.getElapsedTime() / 1000)) * wordsTyped, 2); // Calc wpm
 		textIn.style.backgroundColor = "";
 	},
 	textInputHandler: function (event) {
@@ -258,6 +256,7 @@ timer = {
 	},
 	stop: function () {
 		typeof timerInterval != "undefined" && clearInterval(timerInterval);
+		typeof updateWPM != "undefined" && clearInterval(updateWPM);
 		this.timerStarted = false;
 		this.timerPauseDate = new Date();
 	},
@@ -274,6 +273,13 @@ timer = {
 			timerInterval = setInterval(() => {
 				timeEl.innerHTML = (timer.getElapsedTime() / 1000).toFixed(settings.timerPrecision);
 			}, this.updateInterval);
+
+			updateWPM = setInterval(() => {
+				console.log(main.charactersTypedAmount, main.charactersArray.length, main.wordsArray.length);
+				let wordsTyped = (main.charactersTypedAmount / main.charactersArray.length) * main.wordsArray.length
+				console.log(wordsTyped);
+				document.querySelector("wpm").innerHTML = Math.round((60 / (timer.getElapsedTime() / 1000)) * wordsTyped, 2); // Calc wpm
+			}, 1000);
 			this.timerStarted = true;
 		}
 	},
@@ -306,8 +312,8 @@ function settingDefaults() {
 
 }
 
-textIn.addEventListener("input", event => typingTest.textInputHandler(event)); // Typing listener || Input listener
-textIn.addEventListener('keydown', event => typingTest.highlightCursorHandler()); //cursor position highlighter
+textIn.addEventListener("input", event => main.textInputHandler(event)); // Typing listener || Input listener
+textIn.addEventListener('keydown', event => main.highlightCursorHandler()); //cursor position highlighter
 settingsEl.addEventListener('keyup', event => { event.keyCode == 13 && settings.toggleSettings() }); // Settings (open || close) listeners
 settings_button.addEventListener('click', e => settings.toggleSettings())
 document.querySelector('.reset').addEventListener('click', reset = () => {
@@ -315,7 +321,7 @@ document.querySelector('.reset').addEventListener('click', reset = () => {
 	timer.stop();
 	timer.reset();
 	textIn.value = '';
-	typingTest.generateWords();
+	main.generateWords();
 	document.querySelector("mistakes").innerHTML = 0;
 	document.querySelector("wpm").innerHTML = 0;
 	textIn.focus();
@@ -348,5 +354,5 @@ settingsEl.innerHTML = settingsHTML;
 
 
 //Main calls
-typingTest.generateWords();
+main.generateWords();
 textIn.focus();
