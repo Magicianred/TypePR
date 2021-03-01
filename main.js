@@ -76,6 +76,7 @@ settings = {
 	toggleSettings: function () {
 
 		timer.stop();
+		timer.reset();
 		if (settingsEl.style.display != 'block') {
 			settingsEl.style.display = 'block';
 			mainContainerEl.style.display = 'none'
@@ -131,6 +132,7 @@ typingTest = {
 		textToType.innerHTML = this.newSectionText;
 		textIn.value = '';
 		textIn.style.backgroundColor = "";
+
 		if (settings.highlightCursor) {
 			previousHighlighCharacterElement = textToType.children[0]
 			// previousHighlighCharacterElement.style.backgroundColor = 'var(--highlight-color)';
@@ -144,7 +146,7 @@ typingTest = {
 		wordsTyped++;
 		//Check if there is next word \/
 		this.currentWordIndex + 1 != this.wordsArray.length && textToType.children[this.currentWordIndex + 1].scrollIntoView({ block: "start", inline: "nearest" });
-		document.querySelector("wpm").innerHTML = Math.round((60 / (timer.timerElapsed / 1000)) * wordsTyped, 2); // Calc wpm
+		document.querySelector("wpm").innerHTML = Math.round((60 / (timer.getElapsedTime() / 1000)) * wordsTyped, 2); // Calc wpm
 		textIn.style.backgroundColor = "";
 	},
 	textInputHandler: function (event) {
@@ -167,11 +169,7 @@ typingTest = {
 			textIn.focus();
 			return false;
 		}
-
-
-
 		timer.timerStarted == false && timer.resume();
-
 		let checkIfMistakeOccurred =
 			!event.inputType.includes('delete') &&
 			characterIn != this.charactersArray[this.currentCharacterIndex] &&
@@ -191,6 +189,7 @@ typingTest = {
 			event.stopPropagation();
 			event.preventDefault();
 			this.prepareNextWord();
+			timer.reset();
 			timer.stop();
 			timerStarted = false;
 			this.generateWords();
@@ -207,10 +206,15 @@ typingTest = {
 			//Check if the input characters match the onscreen characters and highligh them.
 			for (let i = 0; i <= this.furthestCharacterColored - this.charactersTypedAmount; i++) {
 				let currentCharacterElement = textToType.children[this.charactersTypedAmount + i];
+				if (currentCharacterElement.innerHTML.trim() == "_") currentCharacterElement.innerHTML = ' '
 				if (i < inputText.length) {
 					//color the characters based on their correctness.
-					if (inputText[i] == currentCharacterElement.innerHTML && i <= currentWord.length) currentCharacterElement.style.color = "var(--correct-color)";
-					else { currentCharacterElement.style.color = "var(--mistake-color)"; (mistakeEncountered = true); }
+					if (inputText[i] == currentCharacterElement.innerHTML && i <= currentWord.length)
+						currentCharacterElement.style.color = "var(--correct-color)";
+					else {
+						currentCharacterElement.style.color = "var(--mistake-color)"; (mistakeEncountered = true);
+						if (currentCharacterElement.innerHTML.trim() == "") currentCharacterElement.innerHTML = '_'
+					}
 				} else currentCharacterElement.style.color = ""; //If we exhausted all the characters inputted and the word is not yet finished 
 			}
 			(mistakeEncountered && (textIn.style.background = "var(--mistake-color)")) || (textIn.style.background = "");
@@ -235,45 +239,46 @@ typingTest = {
 			return a.trim() == b.trim();
 		}
 	}
-
 }
-
-
-
 
 timer = {
 	timerStarted: false,
 	timerElapsed: 0, //ms
 	updateInterval: 10,
-	start: () => {
+	timerStartedDate: 0,
+	timerPausedDate: 0,
 
-		timer.timerElapsed = 0;
-		timer.resume()
-
+	getElapsedTime: function () {
+		return this.timerElapsed = new Date() - this.timerStartedDate
 	},
-	stop: () => {
+
+	start: function () {
+		this.reset()
+		this.resume()
+	},
+	stop: function () {
 		typeof timerInterval != "undefined" && clearInterval(timerInterval);
-		timer.timerStarted = false;
+		this.timerStarted = false;
+		this.timerPauseDate = new Date();
 	},
-	reset: () => {
-		timer.timerElapsed = 0;
+	reset: function () {
+		this.timerStartedDate = 0
+		this.timerElapsed = 0;
+		this.timerPausedDate = 0;
 		timeEl.innerHTML = ''
-		timer.elSet(0);
+		this.elSet(0);
 	},
-	resume: () => {
-		if (!timer.timerStarted) {
+	resume: function () {
+		this.timerStartedDate = this.timerStartedDate + (new Date() - this.timerPausedDate);
+		if (!this.timerStarted) {
 			timerInterval = setInterval(() => {
-				timer.timerElapsed += timer.updateInterval;
-				timeEl.innerHTML = (timer.timerElapsed / 1000).toFixed(settings.timerPrecision);
-			}, timer.updateInterval);
-			timer.timerStarted = true;
+				timeEl.innerHTML = (timer.getElapsedTime() / 1000).toFixed(settings.timerPrecision);
+			}, this.updateInterval);
+			this.timerStarted = true;
 		}
-
 	},
 	elSet: (x = 0) => {
 		timeEl.innerHTML = x;
-
-
 	}
 };
 
